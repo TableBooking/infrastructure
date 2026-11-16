@@ -1,0 +1,246 @@
+{
+  "exchanges": [
+    {
+      "name": "restaurant.events",
+      "type": "topic",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    },
+    {
+      "name": "restaurant.retry",
+      "type": "direct",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    },
+    {
+      "name": "restaurant.dlx",
+      "type": "direct",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    }
+  ],
+  "queues": [
+    {
+      "name": "booking.lifecycle.q",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-dead-letter-exchange": "restaurant.dlx",
+        "x-dead-letter-routing-key": "booking.lifecycle.q",
+        "x-queue-type": "classic"
+      }
+    },
+    {
+      "name": "booking.lifecycle.q.retry",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-message-ttl": 5000,
+        "x-dead-letter-exchange": "",
+        "x-dead-letter-routing-key": "booking.lifecycle.q",
+        "x-queue-type": "classic"
+      }
+    },
+    {
+      "name": "booking.lifecycle.q.dlq",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-queue-type": "classic"
+      }
+    },
+    {
+      "name": "operations.requests.q",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-dead-letter-exchange": "restaurant.dlx",
+        "x-dead-letter-routing-key": "operations.requests.q",
+        "x-queue-type": "classic"
+      }
+    },
+    {
+      "name": "operations.requests.q.retry",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-message-ttl": 5000,
+        "x-dead-letter-exchange": "",
+        "x-dead-letter-routing-key": "operations.requests.q",
+        "x-queue-type": "classic"
+      }
+    },
+    {
+      "name": "operations.requests.q.dlq",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-queue-type": "classic"
+      }
+    },
+    {
+      "name": "tracking.lifecycle.q",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-dead-letter-exchange": "restaurant.dlx",
+        "x-dead-letter-routing-key": "tracking.lifecycle.q",
+        "x-queue-type": "classic"
+      }
+    },
+    {
+      "name": "tracking.lifecycle.q.retry",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-message-ttl": 5000,
+        "x-dead-letter-exchange": "",
+        "x-dead-letter-routing-key": "tracking.lifecycle.q",
+        "x-queue-type": "classic"
+      }
+    },
+    {
+      "name": "tracking.lifecycle.q.dlq",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-queue-type": "classic"
+      }
+    },
+    {
+      "name": "notification.lifecycle.q",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-dead-letter-exchange": "restaurant.dlx",
+        "x-dead-letter-routing-key": "notification.lifecycle.q",
+        "x-queue-type": "classic"
+      }
+    },
+    {
+      "name": "notification.lifecycle.q.retry",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-message-ttl": 5000,
+        "x-dead-letter-exchange": "",
+        "x-dead-letter-routing-key": "notification.lifecycle.q",
+        "x-queue-type": "classic"
+      }
+    },
+    {
+      "name": "notification.lifecycle.q.dlq",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-queue-type": "classic"
+      }
+    }
+  ],
+  "bindings": [
+    {
+      "source": "restaurant.events",
+      "destination": "booking.lifecycle.q",
+      "destination_type": "queue",
+      "routing_key": "booking.state-changed.v1",
+      "arguments": {}
+    },
+    {
+      "source": "restaurant.events",
+      "destination": "booking.lifecycle.q",
+      "destination_type": "queue",
+      "routing_key": "booking.cancellation-rejected.v1",
+      "arguments": {}
+    },
+    {
+      "source": "restaurant.retry",
+      "destination": "booking.lifecycle.q.retry",
+      "destination_type": "queue",
+      "routing_key": "booking.lifecycle.q",
+      "arguments": {}
+    },
+    {
+      "source": "restaurant.dlx",
+      "destination": "booking.lifecycle.q.dlq",
+      "destination_type": "queue",
+      "routing_key": "booking.lifecycle.q",
+      "arguments": {}
+    },
+    {
+      "source": "restaurant.events",
+      "destination": "operations.requests.q",
+      "destination_type": "queue",
+      "routing_key": "booking.requested.v1",
+      "arguments": {}
+    },
+    {
+      "source": "restaurant.events",
+      "destination": "operations.requests.q",
+      "destination_type": "queue",
+      "routing_key": "booking.cancel-requested.v1",
+      "arguments": {}
+    },
+    {
+      "source": "restaurant.retry",
+      "destination": "operations.requests.q.retry",
+      "destination_type": "queue",
+      "routing_key": "operations.requests.q",
+      "arguments": {}
+    },
+    {
+      "source": "restaurant.dlx",
+      "destination": "operations.requests.q.dlq",
+      "destination_type": "queue",
+      "routing_key": "operations.requests.q",
+      "arguments": {}
+    },
+    {
+      "source": "restaurant.events",
+      "destination": "tracking.lifecycle.q",
+      "destination_type": "queue",
+      "routing_key": "booking.state-changed.v1",
+      "arguments": {}
+    },
+    {
+      "source": "restaurant.retry",
+      "destination": "tracking.lifecycle.q.retry",
+      "destination_type": "queue",
+      "routing_key": "tracking.lifecycle.q",
+      "arguments": {}
+    },
+    {
+      "source": "restaurant.dlx",
+      "destination": "tracking.lifecycle.q.dlq",
+      "destination_type": "queue",
+      "routing_key": "tracking.lifecycle.q",
+      "arguments": {}
+    },
+    {
+      "source": "restaurant.events",
+      "destination": "notification.lifecycle.q",
+      "destination_type": "queue",
+      "routing_key": "booking.state-changed.v1",
+      "arguments": {}
+    },
+    {
+      "source": "restaurant.retry",
+      "destination": "notification.lifecycle.q.retry",
+      "destination_type": "queue",
+      "routing_key": "notification.lifecycle.q",
+      "arguments": {}
+    },
+    {
+      "source": "restaurant.dlx",
+      "destination": "notification.lifecycle.q.dlq",
+      "destination_type": "queue",
+      "routing_key": "notification.lifecycle.q",
+      "arguments": {}
+    }
+  ]
+}

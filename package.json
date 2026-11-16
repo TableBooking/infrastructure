@@ -1,0 +1,16 @@
+{
+  "name": "restaurant-infrastructure",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22.19" },
+  "scripts": {
+    "setup": "node scripts/setup.mjs",
+    "up": "node scripts/start.mjs",
+    "check": "node scripts/check.mjs",
+    "test": "node --test test/*.test.mjs",
+    "test:integration": "node --test --test-concurrency=1 test/*.integration.mjs",
+    "test:restart": "node --test test/broker.restart.mjs"
+  },
+  "devDependencies": { "amqplib": "^0.10.9" }
+}

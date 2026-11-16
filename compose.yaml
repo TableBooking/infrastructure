@@ -1,0 +1,51 @@
+name: restaurant-infrastructure
+services:
+  rabbitmq:
+    image: rabbitmq:4.4.0-management-alpine@sha256:4841f6384ef8313c3594cd3f2e9f40c10805f8a61c45f08a9a5d9ddea8199267
+    hostname: rabbitmq
+    environment:
+      RABBITMQ_NODENAME: rabbit@rabbitmq
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_ADMIN_USER:?Run npm run setup first}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_ADMIN_PASSWORD:?Run npm run setup first}
+      RABBITMQ_DEFAULT_VHOST: ${RABBITMQ_VHOST:-restaurant}
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+      - type: bind
+        source: ./rabbitmq/rabbitmq.conf
+        target: /etc/rabbitmq/conf.d/20-restaurant.conf
+        read_only: true
+        bind:
+          create_host_path: false
+    networks: [backend]
+    healthcheck:
+      test: ["CMD-SHELL", "rabbitmq-diagnostics -q check_running && rabbitmq-diagnostics -q check_local_alarms"]
+      interval: 5s
+      timeout: 10s
+      start_period: 20s
+      retries: 20
+    restart: unless-stopped
+    stop_grace_period: 30s
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+  rabbitmq-init:
+    image: node:22-alpine@sha256:1314fb30ec37592d5845e5a160d522c0e680972aa534549940b8d73bde88481a
+    working_dir: /workspace
+    command: ["node", "scripts/bootstrap.mjs"]
+    env_file: .env
+    environment:
+      RABBITMQ_MANAGEMENT_URL: http://rabbitmq:15672
+    volumes:
+      - ./scripts:/workspace/scripts:ro
+      - ./rabbitmq/topology.json:/workspace/rabbitmq/topology.json:ro
+    networks: [backend]
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    restart: "no"
+networks:
+  backend:
+    name: ${RABBITMQ_NETWORK:-restaurant-backend}
+    driver: bridge
+volumes:
+  rabbitmq_data:
